@@ -86,7 +86,7 @@ Move the dock anywhere you like, then fine-tune its width and icon size until it
 <tr>
 <td align="center" width="50%" valign="top">
 
-<h3>⚓ Dock Everything</h3>
+<p align="center"><b>⚓ Dock Everything</b></p>
 <img src="images/slide2.png" alt="Dock Everything" width="100%" />
 
 <p align="left">
@@ -101,7 +101,7 @@ Dock any website as its own app with a <b>fully isolated session</b>. Docked app
 </td>
 <td align="center" width="50%" valign="top">
 
-<h3>🔔 System Tray</h3>
+<p align="center"><b>🔔 System Tray</b></p>
 <img src="images/slide3.png" alt="System Tray" width="100%" />
 
 <p align="left">
@@ -118,7 +118,7 @@ Closing the browser window docks Dockium into the tray instead of quitting. It s
 <tr>
 <td align="center" width="50%" valign="top">
 
-<h3>🛡️ Adblocker</h3>
+<p align="center"><b>🛡️ Adblocker</b></p>
 <img src="images/slide5.png" alt="Adblocker" width="100%" />
 
 <p align="left">
@@ -133,7 +133,7 @@ A built-in adblocker that works in both normal tabs and docked sessions.
 </td>
 <td align="center" width="50%" valign="top">
 
-<h3>😴 Power Sleep</h3>
+<p align="center"><b>😴 Power Sleep</b></p>
 <img src="images/slide4.png" alt="Power Sleep" width="100%" />
 
 <p align="left">
@@ -150,7 +150,7 @@ Save RAM and battery without losing your place.
 <tr>
 <td align="center" width="50%" valign="top">
 
-<h3>🧅 Anonymous Browsing</h3>
+<p align="center"><b>🧅 VPN</b></p>
 <img src="images/slide6.png" alt="Anonymous Browsing" width="100%" />
 
 <p align="left">
@@ -165,7 +165,7 @@ Built-in privacy routing, no extensions needed.
 </td>
 <td align="center" width="50%" valign="top">
 
-<h3>🎛️ Your Dock, Your Way</h3>
+<p align="center"><b>🎛️ Your Dock, Your Way</b></p>
 <img src="images/slide7.png" alt="Dock Customization" width="100%" />
 
 <p align="left">
