@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome to Dockium</title>
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body class="intro">
+  <div class="edge" id="edge" aria-hidden="true"></div>
+  <div class="frame">
+    <button class="nav" id="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+
+    <article class="slide" id="slide" data-layout="below" aria-live="polite">
+      <div class="shot"><img id="slide-img" alt=""></div>
+      <div class="copy">
+        <h1 id="slide-title"></h1>
+        <p id="slide-body"></p>
+      </div>
+    </article>
+
+    <button class="nav" id="next" aria-label="Next slide"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+  </div>
+
+  <div class="dots" id="dots" role="tablist" aria-label="Slides"></div>
+  <button class="start" id="start">Start Dockium</button>
+
+  <audio id="music" src="intro.mp3" loop preload="auto"></audio>
+  <button class="mute off" id="mute" aria-label="Play music" aria-pressed="true">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+      <path class="waves" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>
+      <path class="slash" d="M4 4l16 16"/>
+    </svg>
+  </button>
+
+  <!-- Space intro: stars fly past, then the whole layer fades away to reveal slide 1 -->
+  <div class="space" id="space" aria-hidden="true">
+    <canvas id="stars"></canvas>
+    <div class="space-title">DOCKIUM</div>
+  </div>
+
+  <script src="welcome.js"></script>
+</body>
+</html>

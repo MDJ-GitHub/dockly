@@ -1,0 +1,20 @@
+# Copyright 2026 MDJ. Use of this source code is governed by a BSD-style
+# license that can be found in the Chromium LICENSE file.
+
+import("//build/rust/rust_static_library.gni")
+
+# Brave's adblock-rust, exposed to C++ through cxx.
+# The generated header is "<this dir>/lib.rs.h".
+rust_static_library("adblock_rs") {
+  crate_root = "lib.rs"
+  sources = [ "lib.rs" ]
+  allow_unsafe = true 
+  cxx_bindings = [ "lib.rs" ]
+  visibility = [ "//chrome/browser/*" ]
+  deps = [
+    # These paths are produced by gnrt (see README step 1); the version
+    # directory (v0_10) must match the version you vendor.
+    "//third_party/rust/adblock/v0_10:lib",
+    "//third_party/rust/serde_json/v1:lib",
+  ]
+}

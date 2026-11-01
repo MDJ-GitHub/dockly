@@ -1,0 +1,33 @@
+
+/* ---------- Slide transitions (append to the end of welcome.css) ----------
+   The old slide leaves in the direction of travel, the new one arrives from
+   the opposite side. Classes are set by goTo() in welcome.js. */
+.slide[class*="out-"] { will-change: transform, opacity; }
+.slide[class*="in-"]  { will-change: transform, opacity; }
+
+@keyframes out-left  { to   { opacity: 0; transform: translateX(-14vw); } }
+@keyframes in-left   { from { opacity: 0; transform: translateX(14vw); } }
+@keyframes out-right { to   { opacity: 0; transform: translateX(14vw); } }
+@keyframes in-right  { from { opacity: 0; transform: translateX(-14vw); } }
+@keyframes out-up    { to   { opacity: 0; transform: translateY(-14vh); } }
+@keyframes in-up     { from { opacity: 0; transform: translateY(14vh); } }
+@keyframes out-down  { to   { opacity: 0; transform: translateY(14vh); } }
+@keyframes in-down   { from { opacity: 0; transform: translateY(-14vh); } }
+@keyframes out-fade  { to   { opacity: 0; } }
+@keyframes in-fade   { from { opacity: 0; } }
+
+.slide.out-left  { animation: out-left  0.26s ease-in forwards; }
+.slide.out-right { animation: out-right 0.26s ease-in forwards; }
+.slide.out-up    { animation: out-up    0.26s ease-in forwards; }
+.slide.out-down  { animation: out-down  0.26s ease-in forwards; }
+.slide.out-fade  { animation: out-fade  0.26s ease-in forwards; }
+
+.slide.in-left   { animation: in-left   0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.slide.in-right  { animation: in-right  0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.slide.in-up     { animation: in-up     0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.slide.in-down   { animation: in-down   0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.slide.in-fade   { animation: in-fade   0.5s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .slide[class*="out-"], .slide[class*="in-"] { animation-duration: 0.01s; }
+}

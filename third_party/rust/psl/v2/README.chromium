@@ -1,0 +1,11 @@
+Name: psl
+URL: https://crates.io/crates/psl
+Version: 2.1.241
+Revision: 4e6661066b2c07729108aad5ad5d150c833df449
+Update Mechanism: Manual (https://crbug.com/449898466)
+License: Apache-2.0
+License File: //third_party/rust/chromium_crates_io/vendor/psl-v2/LICENSE
+Shipped: yes
+Security Critical: yes
+
+Description: Extract root domain and suffix from a domain name

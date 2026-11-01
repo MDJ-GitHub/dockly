@@ -241,8 +241,8 @@ source_set("tab_container_impl") {
   sources = [
     "tab_container.cc",
     "tab_container_impl.cc",
-    "dockly_hidden_tabs.cc",
-    "dockly_hidden_tabs.h",
+    "dockium_hidden_tabs.cc",
+    "dockium_hidden_tabs.h",
     "tab_slot_animation_delegate.cc",
     "tab_strip_layout_helper.cc",
     "z_orderable_tab_container_element.cc",

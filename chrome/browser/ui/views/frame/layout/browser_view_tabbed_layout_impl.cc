@@ -899,16 +899,97 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
                     bottom_corner_visible);
   }
   
-  // Dockly sidebar: a fixed-width strip on the leading edge, below the
-  // horizontal tab strip and next to the vertical tab strip (if any).
-  if (IsParentedTo(views().dockly_sidebar, views().browser_view)) {
-    const gfx::Rect sidebar_bounds(
-        params.visual_client_area.x(), params.visual_client_area.y(),
-        sidebar_apps::kSidebarWidth, params.visual_client_area.height());
-    layout.AddChild(views().dockly_sidebar, sidebar_bounds, /*visible=*/true);
-    params.InsetHorizontal(sidebar_apps::kSidebarWidth, /*leading=*/true);
-    unclipped_contents_region.Inset(
-        gfx::Insets::TLBR(0, sidebar_apps::kSidebarWidth, 0, 0));
+  // Dockium sidebar: a strip on the left, right, top or bottom of the area
+  // below the horizontal tab strip (next to the vertical tab strip, if any).
+  // The sidebar view reports its thickness as its preferred size: the width
+  // on the left / right, the height on the top / bottom (it is thin while
+  // auto-hidden).
+  if (IsParentedTo(views().dockium_sidebar, views().browser_view)) {
+    const gfx::Rect area = params.visual_client_area;
+    const gfx::Size size = views().dockium_sidebar->GetPreferredSize();
+
+    // Without a horizontal tab strip (vertical tabs) the window's caption
+    // buttons are in the top corner of this area. A strip on the top or right
+    // keeps clear of them instead of running underneath.
+    int leading_width = 0;
+    int trailing_width = 0;
+    int leading_height = 0;
+    int trailing_height = 0;
+    if (needs_exclusion) {
+      if (!params.leading_exclusion.IsEmpty()) {
+        leading_width =
+            base::ClampCeil(params.leading_exclusion.ContentWithPadding().width());
+        leading_height =
+            base::ClampCeil(params.leading_exclusion.ContentWithPadding().height());
+      }
+      if (!params.trailing_exclusion.IsEmpty()) {
+        trailing_width =
+            base::ClampCeil(params.trailing_exclusion.ContentWithPadding().width());
+        trailing_height =
+            base::ClampCeil(params.trailing_exclusion.ContentWithPadding().height());
+      }
+    }
+
+    // While a sidebar app is open with the toolbar hidden in vertical tabs
+    // mode, the page covers the window's own buttons, so the sidebar shows
+    // its own (on every edge but the top). On the right it then starts at the
+    // very top, where those buttons are.
+    const bool show_window_buttons = sidebar_apps::UpdateSidebarWindowButtons(
+        views().dockium_sidebar,
+        layout_data_->tab_strip_type == TabStripType::kVertical);
+
+    gfx::Rect sidebar_bounds;
+    int top_inset = 0;
+    switch (sidebar_apps::GetSidebarPosition(views().dockium_sidebar)) {
+      case sidebar_apps::SidebarPosition::kLeft:
+        sidebar_bounds =
+            gfx::Rect(area.x(), area.y(), size.width(), area.height());
+        params.InsetHorizontal(size.width(), /*leading=*/true);
+        unclipped_contents_region.Inset(gfx::Insets::TLBR(0, size.width(), 0, 0));
+        break;
+      case sidebar_apps::SidebarPosition::kRight: {
+        // The strip reaches the top of the window. With its own close /
+        // maximize / minimize buttons (the window's caption buttons are hidden
+        // then) it needs no room at the top; otherwise it leaves room for the
+        // window's own buttons, and its background shows behind them.
+        top_inset = show_window_buttons ? 0 : trailing_height;
+        sidebar_bounds = gfx::Rect(area.right() - size.width(), area.y(),
+                                   size.width(), area.height());
+        const auto trailing_exclusion = params.trailing_exclusion;
+        params.InsetHorizontal(size.width(), /*leading=*/false);
+        if (trailing_height > 0) {
+          // The caption buttons are still there, above the strip.
+          params.trailing_exclusion = trailing_exclusion;
+        }
+        unclipped_contents_region.Inset(gfx::Insets::TLBR(0, 0, 0, size.width()));
+        break;
+      }
+      case sidebar_apps::SidebarPosition::kTop: {
+        // Ends before the caption buttons (and starts after leading ones).
+        sidebar_bounds = gfx::Rect(
+            area.x() + leading_width, area.y(),
+            std::max(0, area.width() - leading_width - trailing_width),
+            size.height());
+        params.SetTop(area.y() + size.height());
+        unclipped_contents_region.Inset(gfx::Insets::TLBR(size.height(), 0, 0, 0));
+        // A strip at least as tall as the caption buttons uses up that area;
+        // the toolbar below it spans the full width. A thin (auto-hidden)
+        // strip leaves it to the toolbar to keep clear of the buttons.
+        if (size.height() >= std::max(leading_height, trailing_height) &&
+            (leading_height > 0 || trailing_height > 0)) {
+          needs_exclusion = false;
+        }
+        break;
+      }
+      case sidebar_apps::SidebarPosition::kBottom:
+        sidebar_bounds = gfx::Rect(area.x(), area.bottom() - size.height(),
+                                   area.width(), size.height());
+        params.Inset(gfx::Insets::TLBR(0, 0, size.height(), 0));
+        unclipped_contents_region.Inset(gfx::Insets::TLBR(0, 0, size.height(), 0));
+        break;
+    }
+    sidebar_apps::SetSidebarTopInset(views().dockium_sidebar, top_inset);
+    layout.AddChild(views().dockium_sidebar, sidebar_bounds, /*visible=*/true);
   }
 
   // TODO(crbug.com/469425263): Ensure correct layout calculations for the
@@ -1224,10 +1305,10 @@ BrowserViewTabbedLayoutImpl::CalculateProposedLayout(
     }
   }
   
-  // Dockly: the sidebar app page covers exactly the contents area.
-  if (IsParentedTo(views().dockly_app_view, views().browser_view)) {
-    layout.AddChild(views().dockly_app_view, contents_layout.bounds,
-                    views().dockly_app_view->GetVisible());
+  // Dockium: the sidebar app page covers exactly the contents area.
+  if (IsParentedTo(views().dockium_app_view, views().browser_view)) {
+    layout.AddChild(views().dockium_app_view, contents_layout.bounds,
+                    views().dockium_app_view->GetVisible());
   }
 
   // If the window goes out of glass mode, these changes won't hurt anything.

@@ -78,8 +78,8 @@ struct BrowserViewLayoutViews {
   raw_ptr<InfoBarContainerView> infobar_container = nullptr;
   raw_ptr<MultiContentsView> multi_contents_view = nullptr;
   raw_ptr<SidePanel> side_panel = nullptr;
-  raw_ptr<views::View> dockly_sidebar = nullptr;
-  raw_ptr<views::View> dockly_app_view = nullptr;
+  raw_ptr<views::View> dockium_sidebar = nullptr;
+  raw_ptr<views::View> dockium_app_view = nullptr;
   raw_ptr<SidePanelAnimationContentView> side_panel_animation_content = nullptr;
 
   // The contents separator used for when the top container is overlaid.

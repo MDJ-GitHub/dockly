@@ -1,0 +1,8 @@
+COMPANY_FULLNAME=MDJ and The Chromium Authors
+COMPANY_SHORTNAME=MDJ and The Chromium Authors
+PRODUCT_FULLNAME=Dockium
+PRODUCT_SHORTNAME=Dockium
+PRODUCT_INSTALLER_FULLNAME=Dockium Installer
+PRODUCT_INSTALLER_SHORTNAME=Dockium Installer
+COPYRIGHT=Copyright @LASTCHANGE_YEAR@ MDJ and The Chromium Authors. All rights reserved.
+MAC_BUNDLE_ID=com.dockium.Dockium

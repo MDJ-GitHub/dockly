@@ -367,7 +367,7 @@
 #include "chrome/browser/ui/views/sidebar_apps/sidebar_view.h"
 #include "ui/views/controls/webview/webview.h"
 #include "chrome/browser/ui/views/sidebar_apps/sidebar_tray.h"
-#include "chrome/browser/ui/views/tabs/dockly_hidden_tabs.h"
+#include "chrome/browser/ui/views/tabs/dockium_hidden_tabs.h"
 
 
 #if BUILDFLAG(IS_CHROMEOS)
@@ -967,8 +967,12 @@ BrowserView::BrowserView(BrowserWindowInterface* browser)
 
   side_panel_ = AddChildView(std::make_unique<SidePanel>(this));
   
-  // Dockly sidebar: only normal tabbed windows get one.
-  if (browser_->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL) {
+  // Dockium sidebar: only the main window gets one. That is the first normal,
+  // non-Incognito window; every later window (new window, Incognito window,
+  // a shortcut that is launched again) is a side window without a sidebar.
+  if (browser_->GetType() == BrowserWindowInterface::Type::TYPE_NORMAL &&
+      !GetProfile()->IsOffTheRecord() &&
+      sidebar_apps::SidebarTray::ClaimMainWindow(browser_.get())) {
     AddChildView(std::make_unique<sidebar_apps::SidebarView>(
         GetProfile(), browser_.get()));
     auto app_view = std::make_unique<views::WebView>(GetProfile());
@@ -3033,9 +3037,11 @@ void BrowserView::MaybeShowReadingListInSidePanelIPH() {
 }
 
 bool BrowserView::IsBookmarkBarVisible() const {
-     // Dockly: no bookmark bar while a sidebar app is shown.
+     // Dockium: no bookmark bar while a sidebar app is shown (unless the
+     // sidebar's toolbar button was pressed).
      if (sidebar_apps::IsHiddenAppTab(
-             browser_->GetTabStripModel()->GetActiveWebContents())) {
+             browser_->GetTabStripModel()->GetActiveWebContents()) &&
+         !sidebar_apps::IsToolbarShownForApps()) {
        return false;
      }
   if (!WindowFeatureController::From(browser_)->SupportsWindowFeature(
@@ -3076,9 +3082,11 @@ void BrowserView::DisableTabStripEditingForTesting() {
 }
 
 bool BrowserView::IsToolbarVisible() const {
-     // Dockly: no toolbar (back, reload, address bar) while a sidebar app is shown.
+     // Dockium: no toolbar (back, reload, address bar) while a sidebar app is
+     // shown (unless the sidebar's toolbar button was pressed).
      if (sidebar_apps::IsHiddenAppTab(
-             browser_->GetTabStripModel()->GetActiveWebContents())) {
+             browser_->GetTabStripModel()->GetActiveWebContents()) &&
+         !sidebar_apps::IsToolbarShownForApps()) {
        return false;
      }
 #if BUILDFLAG(IS_MAC)
@@ -4604,7 +4612,7 @@ bool BrowserView::RotatePaneFocusFromView(views::View* focused_view,
 
 views::CloseRequestResult BrowserView::OnWindowCloseRequested() {
 	
-     // Dockly: closing the window that hosts the sidebar apps hides it to the
+     // Dockium: closing the window that hosts the sidebar apps hides it to the
      // tray instead, so the apps keep running and receiving notifications.
      if (sidebar_apps::SidebarTray::ShouldHideInsteadOfClosing(browser_.get())) {
        browser_widget_->Hide();
@@ -5134,8 +5142,8 @@ void BrowserView::AddedToWidget() {
   layout_views.infobar_container = infobar_container_;
   layout_views.multi_contents_view = multi_contents_view_;
   layout_views.side_panel = side_panel_;
-  layout_views.dockly_sidebar = GetViewByID(sidebar_apps::kSidebarViewId);
-  layout_views.dockly_app_view = GetViewByID(sidebar_apps::kAppViewId);
+  layout_views.dockium_sidebar = GetViewByID(sidebar_apps::kSidebarViewId);
+  layout_views.dockium_app_view = GetViewByID(sidebar_apps::kAppViewId);
   layout_views.top_container_separator = top_container_separator_;
   // LINT.ThenChange(//chrome/browser/ui/views/frame/layout/browser_view_layout.h:BrowserViewLayoutViews)
 

@@ -2200,7 +2200,10 @@ static_library("ui") {
   }
 
   if (!is_android) {
-    deps += [ "//chrome/browser/ui/webui/downloads" ]
+    deps += [
+      "//chrome/browser/ui/webui/downloads",
+      "//chrome/browser/ui/webui/dockium_welcome",
+    ]
   }
 
   if (is_win || is_mac || is_linux) {
@@ -2535,12 +2538,29 @@ static_library("ui") {
       "views/sidebar_apps/sidebar_app_model.cc",
       "views/sidebar_apps/sidebar_app_model.h",
       "views/sidebar_apps/sidebar_apps_constants.h",
+      "webui/newpage/newpage_constants.h",
+      "webui/newpage/newpage_handler.cc",
+      "webui/newpage/newpage_handler.h",
+      "webui/newpage/newpage_ui.cc",
+      "webui/newpage/newpage_ui.h",
       "views/sidebar_apps/sidebar_view.cc",
       "views/sidebar_apps/sidebar_view.h",
       "views/sidebar_apps/sidebar_tray.cc",
+      "views/sidebar_apps/sidebar_do_not_disturb.cc",
+      "views/sidebar_apps/sidebar_do_not_disturb.h",
       "views/sidebar_apps/sidebar_tray.h",
       "views/sidebar_apps/sidebar_autostart.cc",
       "views/sidebar_apps/sidebar_autostart.h",
+      "views/sidebar_apps/sidebar_vpn.cc",
+      "views/sidebar_apps/sidebar_vpn.h",
+      "views/sidebar_apps/sidebar_tor.cc",
+      "views/sidebar_apps/sidebar_tor.h",
+      "views/sidebar_apps/sidebar_adblock.cc",
+      "views/sidebar_apps/sidebar_adblock.h",
+      "views/sidebar_apps/sidebar_adblock_engine.cc",
+      "views/sidebar_apps/sidebar_adblock_engine.h",
+      "views/sidebar_apps/sidebar_adblock_hooks.cc",
+      "views/sidebar_apps/sidebar_adblock_hooks.h",
       "views/frame/browser_view.h",
       "views/frame/browser_widget.cc",
       "views/frame/browser_widget.h",
@@ -2916,6 +2936,7 @@ static_library("ui") {
       "//chrome/browser/ui/views/webauthn",
       "//chrome/browser/ui/views/webid",
       "//chrome/browser/ui/views/zoom",
+      "//chrome/browser/ui/views/sidebar_apps/adblock_rs",
       "//chrome/browser/ui/webauthn:impl",
       "//chrome/browser/ui/webui/app_service_internals",
       "//chrome/browser/ui/webui/autofill_ml_internals",

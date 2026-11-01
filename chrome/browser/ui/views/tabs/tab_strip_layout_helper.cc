@@ -24,7 +24,7 @@
 #include "ui/views/view_model.h"
 #include "ui/views/view_utils.h"
 
-#include "chrome/browser/ui/views/tabs/dockly_hidden_tabs.h"
+#include "chrome/browser/ui/views/tabs/dockium_hidden_tabs.h"
 
 struct TabStripLayoutHelper::TabSlot {
   static TabStripLayoutHelper::TabSlot CreateForTabSlotView(TabSlotView* view,
@@ -417,7 +417,7 @@ std::optional<int> TabStripLayoutHelper::GetAdjacentSplitTab(
 }
 
 bool TabStripLayoutHelper::SlotIsCollapsedTab(int i) const {
-// Dockly: sidebar app tabs are always collapsed, even in focus mode.
+// Dockium: sidebar app tabs are always collapsed, even in focus mode.
   if (slots_[i].type == TabSlotView::ViewType::kTab) {
     const Tab* tab = views::AsViewClass<Tab>(slots_[i].view);
     if (tab && sidebar_apps::IsHiddenAppTab(tab->tab_handle().Get())) {

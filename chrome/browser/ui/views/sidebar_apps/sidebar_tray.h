@@ -4,6 +4,12 @@
 #ifndef CHROME_BROWSER_UI_VIEWS_SIDEBAR_APPS_SIDEBAR_TRAY_H_
 #define CHROME_BROWSER_UI_VIEWS_SIDEBAR_APPS_SIDEBAR_TRAY_H_
 
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "base/callback_list.h"
+#include "base/functional/callback.h"
 #include "base/memory/raw_ptr.h"
 #include "base/memory/weak_ptr.h"
 #include "base/no_destructor.h"
@@ -12,6 +18,7 @@
 #include "chrome/browser/ui/views/sidebar_apps/sidebar_app_model.h"
 
 class BrowserWindowInterface;
+class Profile;
 class StatusIcon;
 
 namespace sidebar_apps {
@@ -44,6 +51,12 @@ class SidebarTray : public SidebarAppModel::Observer,
   // not being quit.
   static bool ShouldHideInsteadOfClosing(BrowserWindowInterface* browser);
 
+  // The main window is the only window with a sidebar. The first window that
+  // asks becomes the main window and keeps being it while it exists; for every
+  // other window this returns false. If the main window is gone, the next
+  // window that asks takes over.
+  static bool ClaimMainWindow(BrowserWindowInterface* browser);
+
   // True while a browser that was started with --start-in-tray should keep
   // its windows hidden. BrowserView::Show() and friends check this during the
   // first moments after startup; it turns false after about 20 seconds, or as
@@ -57,6 +70,22 @@ class SidebarTray : public SidebarAppModel::Observer,
 
   // The window that holds the apps' tabs. Closing it hides it to the tray.
   void SetHostWindow(base::WeakPtr<BrowserWindowInterface> window);
+
+  // Called with an app id when the user picks that app in the tray menu. Set
+  // by the sidebar of the host window, which owns the apps' tabs.
+  using OpenAppCallback = base::RepeatingCallback<void(const std::string&)>;
+  void SetOpenAppCallback(OpenAppCallback callback);
+
+  // "Sleep all": every sidebar app and / or every regular tab is put to sleep
+  // right now. The sidebar of each window (see SidebarView::SleepAll()) takes
+  // care of its own apps and tabs, so this reaches all windows.
+  using SleepAllCallback = base::RepeatingCallback<void(bool, bool)>;
+  base::CallbackListSubscription AddSleepAllCallback(SleepAllCallback callback);
+  void SleepAll(bool sleep_apps, bool sleep_tabs);
+
+  // Rebuilds the tray menu, so check items (like "Start with Windows") show
+  // the current state after something outside the tray changed them.
+  void RefreshMenu();
 
   SidebarTray(const SidebarTray&) = delete;
   SidebarTray& operator=(const SidebarTray&) = delete;
@@ -79,6 +108,19 @@ class SidebarTray : public SidebarAppModel::Observer,
   void Attach(SidebarAppModel* model);
   void UpdateIcon();
   void CreateContextMenu();
+  // Opens a new (incognito) browser window in the profile of the main window.
+  void OpenNewWindow(bool incognito);
+  Profile* GetProfileForNewWindow();
+  // Do Not Disturb was turned on or off: the menu and the tooltip say so.
+  void OnDoNotDisturbChanged();
+  // Brings the window back and opens the sidebar app |app_id|.
+  void OpenApp(const std::string& app_id);
+  // Shows the unread count of each app in the menu again (the items stay).
+  void UpdateAppMenuLabels();
+  // "Dockium: 5 unread", then one line per app with unread items.
+  std::u16string BuildToolTip() const;
+  // The menu item text of |app|: its name, and its unread count if any.
+  std::u16string AppMenuLabel(const SidebarApp& app) const;
   // Shows and activates the host window (or the last active one).
   void ShowWindow();
 
@@ -89,6 +131,19 @@ class SidebarTray : public SidebarAppModel::Observer,
   raw_ptr<StatusIcon, DanglingUntriaged> icon_ = nullptr;
   base::WeakPtr<BrowserWindowInterface> last_active_window_;
   base::WeakPtr<BrowserWindowInterface> host_window_;
+  base::WeakPtr<BrowserWindowInterface> main_window_;
+  OpenAppCallback open_app_callback_;
+  base::RepeatingCallbackList<void(bool, bool)> sleep_all_callbacks_;
+  base::CallbackListSubscription do_not_disturb_subscription_;
+  // The submenu of the Do Not Disturb item (the menu points to it).
+  std::unique_ptr<StatusIconMenuModel> do_not_disturb_menu_;
+  // The submenu of the Sleep item.
+  std::unique_ptr<StatusIconMenuModel> sleep_menu_;
+  // The tray menu (owned by the status icon, replaced by CreateContextMenu())
+  // and the apps in it: they start at menu index |first_app_index_|.
+  raw_ptr<StatusIconMenuModel, DanglingUntriaged> menu_model_ = nullptr;
+  size_t first_app_index_ = 0;
+  std::vector<std::string> menu_app_ids_;
   // Set when the user chose "Quit" in the tray menu.
   bool quitting_ = false;
 };

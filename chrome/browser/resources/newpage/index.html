@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en" data-theme="system">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>New Page</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='white' stroke-linecap='round'%3E%3Crect x='2.5' y='2.5' width='27' height='27' rx='8' stroke-width='2.4'/%3E%3Cpath d='M16 9v14M9 16h14' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="newpage.css">
+</head>
+<body>
+  <div id="bg"></div>
+  <div id="scrim"></div>
+
+  <main>
+    <div class="top">
+      <header class="bar-row">
+      <form id="searchForm" class="bar glow" autocomplete="off">
+        <input id="q" type="text" placeholder="Search or type a URL" aria-label="Search" spellcheck="false">
+        <span class="sep" aria-hidden="true"></span>
+        <div class="dd" id="aiDd" title="AI assistant"></div>
+        <button type="button" id="aiGo" aria-label="Ask AI" title="Ask AI (Ctrl+Enter)">
+          <svg viewBox="0 0 24 24"><path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M19 15v5M16.5 17.5h5"/></svg>
+        </button>
+        <span class="sep" aria-hidden="true"></span>
+        <div class="dd" id="engineDd" data-align="right" title="Search engine"></div>
+        <div class="tools">
+          <button type="button" id="image" aria-label="Image search" title="Image search with the selected engine">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5-8 9"/></svg>
+          </button>
+          <button type="button" id="voice" aria-label="Search by voice">
+            <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+        </div>
+        <button type="submit" id="go" aria-label="Search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </button>
+        <div id="sugg"></div>
+      </form>
+      <button id="focusBtn" class="gear" aria-label="Hide everything" aria-pressed="false" title="Hide everything">
+        <svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+      <button id="settingsBtn" class="gear" aria-label="Settings">
+        <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+      </button>
+    </header>
+      <div class="meta">
+        <div id="todayStrip" class="today-strip" aria-label="Today"></div>
+        <div class="clock" aria-label="Current time"><time id="clockTime"></time><span id="clockDate"></span></div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <aside class="side">
+        <article id="cal" class="card cal" aria-label="Calendar"></article>
+        <article id="todo" class="card todo" aria-label="To-do list">
+          <div class="todo-head"><strong>To-do</strong><span id="todoCount"></span><button type="button" id="todoClear">Clear done</button></div>
+          <form id="todoForm" autocomplete="off">
+            <input id="todoInput" type="text" maxlength="120" placeholder="Add a task" aria-label="New task">
+            <button type="submit" aria-label="Add task">+</button>
+          </form>
+          <ul id="todoList"></ul>
+        </article>
+        <article id="quote" class="card quote" aria-label="Quote of the day">
+          <div class="quote-label">Quote of the day</div>
+          <blockquote id="quoteText"></blockquote>
+          <cite id="quoteBy"></cite>
+        </article>
+      </aside>
+      <section id="grid" class="grid" aria-label="News"></section>
+    </div>
+  </main>
+
+  <dialog id="settings">
+    <h2>Settings</h2>
+    <label>Theme
+      <select id="sTheme">
+        <option value="system">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+      </select>
+    </label>
+    <label>Background pictures
+      <select id="sBg">
+        <option value="nature">Nature</option>
+        <option value="games">Games</option>
+        <option value="space">Space</option>
+        <option value="city">City</option>
+        <option value="abstract">Abstract</option>
+        <option value="anime">Anime</option>
+        <option value="plain">Plain color (no pictures)</option>
+      </select>
+    </label>
+    <label>Wallpaper changes
+      <select id="sBgMode">
+        <option value="daily">One picture per day</option>
+        <option value="random">Random picture, from several per day</option>
+      </select>
+    </label>
+    <label>Pictures per day (random mode)
+      <input id="sBgCount" type="number" min="2" max="20" step="1">
+    </label>
+    <label>Rows of news cards
+      <select id="sRows">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="sCardAuto"> Automatic card width</label>
+    <label>Width of news cards: <output id="sCardWOut"></output>
+      <input id="sCardW" type="range" min="180" max="520" step="10">
+    </label>
+    <label>Auto-scroll the news every (seconds, 0 = off)
+      <input id="sScroll" type="number" min="0" max="120" step="1">
+    </label>
+    <label class="check"><input type="checkbox" id="sGlassAuto"> Default transparency for the search bar and side cards</label>
+    <label>Opacity of the search bar, calendar, to-do and quote: <output id="sGlassOut"></output>
+      <input id="sGlass" type="range" min="5" max="90" step="1">
+    </label>
+    <label class="check"><input type="checkbox" id="sIntro"> Start animation when the page opens</label>
+    <label>Country for holidays (2-letter code)
+      <input id="sCountry" type="text" maxlength="2" placeholder="e.g. US">
+    </label>
+    <label>Voice transcription server (optional)
+      <input id="sStt" type="url" placeholder="http://localhost:8080/v1/audio/transcriptions">
+    </label>
+    <label>Google Calendar secret iCal address
+      <input id="sGcal" type="url" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics">
+    </label>
+    <label>RSS feeds (one URL per line)
+      <textarea id="sFeeds" rows="10" spellcheck="false"></textarea>
+    </label>
+    <label class="check"><input type="checkbox" id="sFindImg"> Find pictures for stories that have none</label>
+    <label class="check"><input type="checkbox" id="sNewTab"> Open results in a new tab</label>
+    <button type="button" id="sClose">Done</button>
+  </dialog>
+
+  <dialog id="dayDlg">
+    <h2 id="dayTitle"></h2>
+    <ul id="dayList"></ul>
+    <form id="dayForm" autocomplete="off">
+      <input id="dayInput" type="text" maxlength="80" placeholder="Add an event (start with an emoji to pick its icon)" aria-label="New event">
+      <button type="submit">Add</button>
+    </form>
+    <button type="button" id="dayClose">Done</button>
+  </dialog>
+
+  <div id="toast" role="status"></div>
+  <script type="module" src="newpage.js"></script>
+</body>
+</html>

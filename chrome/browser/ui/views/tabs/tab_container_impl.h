@@ -351,9 +351,9 @@ class TabContainerImpl : public TabContainer,
 
   const std::unique_ptr<TabStripLayoutHelper> layout_helper_;
   
-  // Dockly: recompute the layout when a sidebar app tab is hidden or shown.
-  void OnDocklyHiddenTabsChanged();
-  base::CallbackListSubscription dockly_hidden_tabs_subscription_;
+  // Dockium: recompute the layout when a sidebar app tab is hidden or shown.
+  void OnDockiumHiddenTabsChanged();
+  base::CallbackListSubscription dockium_hidden_tabs_subscription_;
 
   // MouseWatcher is used when a tab is closed to reset the layout.
   std::unique_ptr<views::MouseWatcher> mouse_watcher_;

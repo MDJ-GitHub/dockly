@@ -1,0 +1,283 @@
+:root {
+  --bg: #272829;
+  --panel: #323436;
+  --text: #ecebe6;
+  --muted: #a9acaf;
+  --accent: #7c9cff;
+  --accent-text: #11131a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; overflow: hidden; }
+
+/* Everything fits in the window: [slide area] [dots] [Start button] */
+body {
+  height: 100vh;
+  background: #04050b;
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  justify-items: center;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 16px 24px;
+}
+
+.frame {
+  width: min(1100px, 100%);
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) 64px;
+  align-items: center;
+  gap: 48px;
+}
+
+.nav {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #4a4d50;
+  background: linear-gradient(145deg, #3a3d40, #2b2d2f);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+              background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.nav:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  transform: scale(1.08);
+  box-shadow: 0 8px 22px rgba(124, 156, 255, 0.35);
+}
+.nav:active:not(:disabled) { transform: scale(0.96); }
+.nav:disabled { opacity: 0.25; cursor: default; box-shadow: none; }
+
+/* Slide layouts: "below" (default), "text-left", "text-right".
+   --reserve = vertical space kept for everything that is not the picture,
+   so the picture shrinks to fit the window height instead of pushing the
+   text and the Start button off screen. */
+.slide {
+  --reserve: 360px;
+  min-height: 0;
+  max-height: 100%;
+  display: grid;
+  gap: 18px;
+  align-items: center;
+  justify-items: center;
+}
+.slide[data-layout="below"]      { grid-template-columns: minmax(0, 1fr); }
+.slide[data-layout="text-left"]  { grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); --reserve: 150px; gap: 32px; }
+.slide[data-layout="text-right"] { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); --reserve: 150px; gap: 32px; }
+.slide[data-layout="text-left"] .copy { order: -1; }
+
+.shot {
+  width: min(100%, calc((150vh - var(--reserve)) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  background: var(--panel);
+  border: 2px solid #4a4d50;
+  border-radius: 6px;
+  position: relative;
+  isolation: isolate;
+}
+.shot img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 4px;
+}
+
+.copy h1 { margin: 0 0 6px; font-size: clamp(1.3rem, 3.2vh, 1.9rem); font-weight: 600; }
+.copy p  { margin: 0; font-size: clamp(0.95rem, 2vh, 1.1rem); line-height: 1.5; color: var(--muted); max-width: 60ch; }
+.slide[data-layout="below"] .copy { text-align: center; }
+.slide[data-layout="below"] .copy p { max-width: 82ch; margin-inline: auto; }
+
+.slide { transition: opacity 0.18s ease; }
+.slide.changing { opacity: 0; }
+
+.dots { display: flex; gap: 10px; }
+.dot {
+  width: 10px; height: 10px; padding: 0;
+  border-radius: 50%; border: 0;
+  background: #55595c; cursor: pointer;
+}
+.dot.on { background: var(--accent); }
+
+.start {
+  min-width: 200px;
+  padding: 12px 28px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--accent);
+  color: var(--accent-text);
+  font: 600 1.05rem "Segoe UI", system-ui, sans-serif;
+  cursor: pointer;
+}
+.start:hover { filter: brightness(1.1); }
+
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .frame { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 14px; }
+  .nav { width: 44px; height: 44px; }
+  .nav svg { width: 20px; height: 20px; }
+  .slide[data-layout] { grid-template-columns: minmax(0, 1fr); --reserve: 340px; }
+  .slide[data-layout="text-left"] .copy { order: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide, .nav { transition: none; }
+}
+
+
+/* ---------- Effects ---------- */
+/* One soft, slightly muted spectrum, reused by both effects.
+   It starts and ends on the same colour so it can loop seamlessly. */
+:root {
+  --spectrum: #ff8a80, #ffc77d, #f4eb8c, #8be0a5, #7cc4ff, #a592ff, #e19bff, #ff8a80;
+}
+
+@property --spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Slide effect "frame": a rainbow glow that travels around the picture. */
+.shot::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  z-index: -1;
+  border-radius: 16px;
+  background: conic-gradient(from var(--spin), var(--spectrum));
+  filter: blur(18px);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  animation: spin 9s linear infinite;
+  pointer-events: none;
+}
+body[data-effect="frame"] .shot::before { opacity: 0.5; }
+
+@keyframes spin { to { --spin: 360deg; } }
+
+/* Slide effect "edge": rainbow glow along the left edge of the window.
+   The colours flow down the edge in a continuous loop. */
+.edge {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 72px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: linear-gradient(to bottom, var(--spectrum));
+  background-size: 100% 100vh;
+  background-repeat: repeat-y;
+  animation: edge-flow 8s linear infinite;
+  -webkit-mask-image: linear-gradient(to right,
+      rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 14%, transparent 100%);
+  mask-image: linear-gradient(to right,
+      rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 14%, transparent 100%);
+}
+body[data-effect="edge"] .edge { opacity: 0.8; }
+
+@keyframes edge-flow {
+  from { background-position: 0 0; }
+  to   { background-position: 0 100vh; }
+}
+
+/* Arriving on slide 2: the edge starts weak, swells to a strong glow, then
+   settles back to its normal (default) level. */
+.edge.burst {
+  animation: edge-flow 8s linear infinite,
+             edge-burst 2.6s ease-in-out;
+}
+@keyframes edge-burst {
+  0%   { opacity: 0.25; width: 50px;  filter: saturate(0.9) brightness(0.9); }
+  40%  { opacity: 1;    width: 260px; filter: saturate(1.9) brightness(1.6); }
+  100% { opacity: 0.8;  width: 72px;  filter: saturate(1)   brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shot::before, .edge, .edge.burst { animation: none; }
+}
+
+
+/* ---------- Space intro ---------- */
+.space {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(80, 60, 160, 0.25), transparent 55%),
+    radial-gradient(ellipse at 75% 25%, rgba(40, 90, 170, 0.22), transparent 50%),
+    #04050b;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  animation: space-in 2.2s ease-out forwards;       /* fades in from black */
+}
+@keyframes space-in { to { opacity: 1; } }
+/* After the intro the stars stay as a slow background under the slides. */
+.space.behind { z-index: -1; pointer-events: none; }
+.space canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+.space-title {
+  position: relative;
+  font-size: clamp(2rem, 8vw, 5rem);
+  font-weight: 200;
+  letter-spacing: 0.5em;
+  padding-left: 0.5em;           /* balances the trailing letter-spacing */
+  color: #fff;
+  text-shadow: 0 0 30px rgba(124, 156, 255, 0.7);
+  opacity: 0;
+  animation: title-in-out 3.4s ease-in-out 1.8s forwards;
+}
+@keyframes title-in-out {
+  0%   { opacity: 0; letter-spacing: 0.9em; filter: blur(8px); }
+  30%  { opacity: 1; letter-spacing: 0.5em; filter: blur(0); }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* While the intro plays, the real UI is hidden and then fades in. */
+.frame, .dots, .start { transition: opacity 1.6s ease 0.2s; }
+body.intro .frame,
+body.intro .dots,
+body.intro .start { opacity: 0; pointer-events: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .space-title { animation: none; }
+  .space { animation: none; opacity: 1; }
+}
+
+
+/* Music button (bottom-right corner) */
+.mute {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid #4a4d50;
+  background: linear-gradient(145deg, #3a3d40, #2b2d2f);
+  color: var(--text);
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.mute:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.mute[hidden] { display: none; }
+.mute .slash { display: none; }
+.mute.off .slash { display: block; }
+.mute.off .waves { display: none; }

@@ -17,7 +17,7 @@ namespace {
 
 constexpr wchar_t kRunKeyPath[] =
     L"Software\\Microsoft\\Windows\\CurrentVersion\\Run";
-constexpr wchar_t kValueName[] = L"Dockly";
+constexpr wchar_t kValueName[] = L"Dockium";
 
 // "C:\path\to\chrome.exe" --start-in-tray
 std::wstring BuildStartupCommand() {

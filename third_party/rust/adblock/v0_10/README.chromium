@@ -1,0 +1,11 @@
+Name: adblock
+URL: https://crates.io/crates/adblock
+Version: 0.10.4
+Revision: 1bfadd63467c2d7d81d9404dd191578945b19be8
+Update Mechanism: Manual (https://crbug.com/449898466)
+License: MPL-2.0
+License File: //third_party/rust/chromium_crates_io/vendor/adblock-v0_10/LICENSE
+Shipped: yes
+Security Critical: yes
+
+Description: Native Rust module for Adblock Plus syntax (e.g. EasyList, EasyPrivacy) filter parsing and matching.

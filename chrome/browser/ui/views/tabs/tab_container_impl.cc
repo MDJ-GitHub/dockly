@@ -38,7 +38,7 @@
 #include "ui/views/rect_based_targeting_utils.h"
 #include "ui/views/view_utils.h"
 
-#include "chrome/browser/ui/views/tabs/dockly_hidden_tabs.h"
+#include "chrome/browser/ui/views/tabs/dockium_hidden_tabs.h"
 
 namespace {
 // When the window has a top drag handle, a thin strip at the top of
@@ -103,9 +103,9 @@ TabContainerImpl::TabContainerImpl(
 
   overall_bounds_view_->SetVisible(false);
   
-  dockly_hidden_tabs_subscription_ =
+  dockium_hidden_tabs_subscription_ =
       sidebar_apps::AddHiddenAppTabsChangedCallback(base::BindRepeating(
-          &TabContainerImpl::OnDocklyHiddenTabsChanged,
+          &TabContainerImpl::OnDockiumHiddenTabsChanged,
           base::Unretained(this)));
 }
 
@@ -739,7 +739,7 @@ void TabContainerImpl::ExitTabClosingMode() {
   override_available_width_for_tabs_.reset();
 }
 
-void TabContainerImpl::OnDocklyHiddenTabsChanged() {
+void TabContainerImpl::OnDockiumHiddenTabsChanged() {
   InvalidateIdealBounds();
   CompleteAnimationAndLayout();
   SetTabSlotVisibility();
@@ -805,7 +805,7 @@ void TabContainerImpl::SetTabSlotVisibility() {
         current_group.has_value() &&
         controller_->IsGroupCollapsed(current_group.value());
 
-    // Dockly: sidebar app tabs are always collapsed.
+    // Dockium: sidebar app tabs are always collapsed.
     const bool is_hidden_app_tab =
         sidebar_apps::IsHiddenAppTab(tab->tab_handle().Get());
 

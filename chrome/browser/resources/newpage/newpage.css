@@ -1,0 +1,477 @@
+:root {
+  --panel: rgba(18, 20, 24, .62);
+  --glass-rgb: 18 20 24;
+  --glass-a: .32;   /* opacity of the search bar and the calendar / to-do / quote cards (lower = more transparent) */
+  --glass: rgb(var(--glass-rgb) / var(--glass-a));
+  --panel-solid: rgba(18, 20, 24, .92);
+  --text: #f2f4f7;
+  --muted: rgba(242, 244, 247, .65);
+  --line: rgba(255, 255, 255, .18);
+  --event: #7ad9c8;
+  --holiday: #52d273;
+  --gcal: #ff6b6b;
+  --custom: #6cb6ff;
+  --scrim: rgba(0, 0, 0, .38);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --panel: rgba(255, 255, 255, .74);
+  --glass-rgb: 255 255 255;
+  --glass-a: .32;
+  --panel-solid: rgba(255, 255, 255, .95);
+  --text: #14171c;
+  --muted: rgba(20, 23, 28, .62);
+  --line: rgba(0, 0, 0, .14);
+  --event: #0f8f7e;
+  --holiday: #1e9e4a;
+  --gcal: #d93025;
+  --custom: #1a73e8;
+  --scrim: rgba(255, 255, 255, .12);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    --panel: rgba(255, 255, 255, .74);
+    --glass-rgb: 255 255 255;
+    --glass-a: .32;
+  --panel-solid: rgba(255, 255, 255, .95);
+    --text: #14171c;
+    --muted: rgba(20, 23, 28, .62);
+    --line: rgba(0, 0, 0, .14);
+    --event: #0f8f7e;
+    --holiday: #1e9e4a;
+  --gcal: #d93025;
+  --custom: #1a73e8;
+    --scrim: rgba(255, 255, 255, .12);
+    color-scheme: light;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body {
+  font: 15px/1.4 system-ui, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: #363840;   /* the page colour: shown until a picture is ready, and always in "Plain color" mode */
+}
+
+#bg, #scrim { position: fixed; inset: 0; }
+#bg {
+  background: center / cover no-repeat;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+#bg.ready { opacity: 1; }
+#scrim { background: var(--scrim); transition: opacity .6s ease; }
+/* no picture on screen: show the plain colour untouched */
+#bg:not(.ready) + #scrim { opacity: 0; }
+
+main { position: relative; height: 100%; display: flex; flex-direction: column; }
+/* fixed top: search bar, then today's events and a small clock */
+.top { flex: none; position: relative; z-index: 50; width: min(860px, calc(100% - 48px)); margin: 0 auto; --pad: clamp(12px, 2.5vh, 26px); padding-top: var(--pad); transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
+.stage { flex: 1; min-height: 0; display: flex; gap: 22px; padding: 14px 0 18px; overflow-x: clip; }
+
+/* ---------- search row ---------- */
+.bar-row { display: flex; gap: 12px; align-items: center; margin: 0; }
+.bar {
+  position: relative;
+  z-index: 20;
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  height: 54px;
+  padding: 0 5px;
+  gap: 2px;
+  background: var(--glass);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  backdrop-filter: blur(14px);
+}
+.bar input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 18px;
+  font: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: none;
+  border: 0;
+  outline: 0;
+}
+.bar input::placeholder { color: var(--muted); }
+select option { color: #14171c; background: #fff; }
+.tools { display: flex; }
+
+button { font: inherit; color: var(--text); cursor: pointer; }
+.bar button, .gear {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  background: none;
+  border: 0;
+}
+.bar button:hover, .gear:hover { background: var(--line); }
+/* every control in the bar is its own rounded pill, so hover is rounded on all sides */
+.bar button { align-self: center; width: 44px; height: 42px; border-radius: 10px; }
+.bar button:focus-visible, .gear:focus-visible, .bar select:focus-visible,
+.card:focus-visible { outline: 2px solid var(--event); outline-offset: -2px; }
+.gear {
+  height: 54px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  backdrop-filter: blur(14px);
+}
+svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+#sugg {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 8px 14px;
+  padding: 10px;
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  backdrop-filter: blur(18px);
+  /* closed by default; slides down when the search box is focused */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+  clip-path: inset(0 0 100% 0 round 14px);
+  transition: opacity .18s ease, transform .22s ease, clip-path .22s ease, visibility 0s linear .22s;
+}
+#sugg.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  clip-path: inset(0 round 14px);
+  transition: opacity .18s ease, transform .22s ease, clip-path .22s ease, visibility 0s;
+}
+#sugg.single { grid-template-columns: 1fr; }
+#sugg .col + .col { padding-left: 14px; border-left: 1px solid var(--line); }
+#sugg.single .col + .col { padding-left: 0; border-left: 0; }
+#sugg h4 { margin: 2px 10px 6px; font-size: 12px; font-weight: 500; color: var(--muted); }
+#sugg ul { margin: 0; padding: 0; list-style: none; }
+#sugg li { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+#sugg li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sugg li svg { width: 14px; height: 14px; flex: none; color: var(--muted); }
+#sugg li.active, #sugg li:hover { background: var(--line); }
+#sugg li button {
+  display: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+}
+#sugg li:hover button, #sugg li.active button { display: block; }
+#sugg li button:hover { background: var(--line); color: var(--text); }
+
+/* ---------- soft moving multicolour glow (smooth gradient, no flag stripes) ---------- */
+@property --ang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes spin { to { --ang: 360deg; } }
+.glow::before, .glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  padding: 2px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(from var(--ang), #ff6b9a, #ffb347, #c6f26b, #4de3c1, #5aa9ff, #a77bff, #ff6b9a);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: spin 12s linear infinite;
+}
+.glow::before { opacity: .45; }
+.glow::after { inset: -5px; padding: 8px; filter: blur(9px); opacity: .3; }
+
+/* ---------- events + small clock, right under the search bar ---------- */
+.meta { display: flex; align-items: center; flex-wrap: wrap; gap: 2px 14px; margin: 8px 0 0 6px; color: #fff; text-shadow: 0 1px 10px rgba(0, 0, 0, .65); font-size: 13px; }
+.today-strip { display: flex; flex-wrap: wrap; gap: 2px 14px; }
+.today-strip:empty { display: none; }
+.t-item { display: inline-flex; align-items: center; gap: 6px; }
+.clock { display: flex; align-items: baseline; gap: 8px; opacity: .88; }
+.today-strip:not(:empty) + .clock { padding-left: 14px; border-left: 1px solid rgba(255, 255, 255, .4); }
+#clockTime { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- custom dropdowns (engine, AI) with icons ---------- */
+.dd { position: relative; align-self: center; }
+.bar .dd-btn { display: flex; align-items: center; gap: 8px; width: auto; padding: 0 10px; }
+.ico { width: 16px; height: 16px; border-radius: 4px; flex: none; }
+/* the arrow sits right next to the name */
+.chev { width: 6px; height: 6px; margin: -3px 2px 0 0; border-right: 1.8px solid var(--muted); border-bottom: 1.8px solid var(--muted); transform: rotate(45deg); }
+.dd-list {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  z-index: 40;
+  min-width: 100%;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(18px);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .15s ease, transform .18s ease, visibility 0s linear .18s;
+}
+.dd[data-align="right"] .dd-list { left: auto; right: 0; }
+.dd-list.open { visibility: visible; opacity: 1; pointer-events: auto; transform: none; transition: opacity .15s ease, transform .18s ease, visibility 0s; }
+.dd-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+.dd-list li:hover, .dd-list li.active { background: var(--line); }
+.dd-list li[aria-selected="true"] { font-weight: 600; }
+
+/* ---------- grid ---------- */
+/* ---------- left column (fixed): calendar, to-do, quote ---------- */
+.side { flex: none; width: clamp(290px, 24vw, 360px); display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+/* each card reaches past the left edge of the screen and slides in from there */
+.side .card { margin-left: -34px; padding: 16px 18px 16px 52px; color: var(--text); background: var(--glass); backdrop-filter: blur(14px); }
+
+/* ---------- start animation (class "intro" is on <html> only when it is switched on) ----------
+   search bar slides down, side cards slide in from the left, news strip slides in from the right.
+   The strip is animated as a whole, so it slides in even while its cards are still loading. */
+html.intro .top { animation: intro-down .75s cubic-bezier(.2, .8, .2, 1) backwards; }
+html.intro .side .card { animation: intro-side .8s cubic-bezier(.2, .8, .2, 1) backwards; }
+html.intro .side .card:nth-child(1) { animation-delay: .20s; }
+html.intro .side .card:nth-child(2) { animation-delay: .30s; }
+html.intro .side .card:nth-child(3) { animation-delay: .40s; }
+html.intro .grid { animation: intro-news .9s cubic-bezier(.2, .8, .2, 1) .25s backwards; }
+/* No opacity in these: it would switch off the glass blur inside the moving element until the animation ends. */
+@keyframes intro-down { from { transform: translateY(-250%); } }
+@keyframes intro-side { from { transform: translateX(-120%); } }   /* from off-screen left, to the right */
+@keyframes intro-news { from { transform: translateX(100vw); } }    /* from off-screen right, to the left */
+
+/* ---------- news: rows fill top to bottom, columns scroll sideways ---------- */
+.grid {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: repeat(var(--rows, 3), minmax(0, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: var(--card-w, clamp(230px, 19vw, 300px));
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.grid::-webkit-scrollbar { display: none; }
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* RSS cards */
+.rss .cover { position: absolute; inset: 0; background: center / cover no-repeat; }
+.rss::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, .78), rgba(0, 0, 0, 0) 62%);
+}
+.rss .text { position: absolute; left: 16px; right: 16px; bottom: 14px; z-index: 1; }
+.rss h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  opacity: .72;
+  transition: opacity .2s;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.rss p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height .25s ease, opacity .25s ease, margin .25s ease;
+}
+.rss:hover h3, .rss:focus-visible h3 { opacity: 1; }
+.rss:hover p, .rss:focus-visible p { max-height: 6.5em; opacity: .9; margin-top: 8px; }
+.rss.empty { display: grid; place-items: center; text-align: center; padding: 20px; color: var(--muted); }
+.rss.skeleton { animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .55; } }
+
+/* calendar */
+.cal { color: var(--text); padding: 16px 18px; backdrop-filter: blur(14px); display: flex; flex-direction: column; }
+.cal-head { flex: none; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cal-head strong { font-size: 16px; }
+.cal-head button { width: 28px; height: 28px; background: none; border: 0; border-radius: 8px; font-size: 18px; line-height: 1; }
+.cal-head button:hover { background: var(--line); }
+.cal-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; align-items: center; justify-items: center; }
+.cal-grid .dow { font-size: 11px; color: var(--muted); }
+.day {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.day:hover { background: var(--line); }
+.day.other { color: var(--muted); opacity: .55; }
+.day.today, .day.today:hover { background: var(--text); color: var(--panel-solid); font-weight: 700; }
+.cal-legend { display: flex; flex-wrap: wrap; flex: none; gap: 4px 14px; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.cal-legend i { display: inline-block; width: 10px; height: 10px; box-sizing: border-box; border: 2px solid transparent; border-radius: 50%; margin-right: 5px; }
+
+[hidden] { display: none !important; }
+
+/* to-do */
+.todo { flex: 1 1 0; min-height: 96px; display: flex; flex-direction: column; }
+.todo-head { flex: none; display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.todo-head strong { font-size: 16px; }
+.todo-head span { font-size: 12px; color: var(--muted); }
+.todo-head button { margin-left: auto; padding: 2px 8px; font-size: 12px; color: var(--muted); background: none; border: 0; border-radius: 6px; }
+.todo-head button:hover { background: var(--line); color: var(--text); }
+#todoForm { flex: none; display: flex; gap: 6px; margin-bottom: 6px; }
+#todoInput { flex: 1; min-width: 0; padding: 7px 10px; font: inherit; font-size: 14px; color: var(--text); background: var(--line); border: 1px solid transparent; border-radius: 10px; outline: 0; }
+#todoInput:focus { border-color: var(--event); }
+#todoInput::placeholder { color: var(--muted); }
+#todoForm button { width: 32px; border: 0; border-radius: 10px; background: var(--text); color: var(--panel-solid); font-size: 18px; line-height: 1; }
+#todoList { flex: 1; min-height: 0; margin: 0; padding: 0; list-style: none; overflow-y: auto; scrollbar-width: thin; }
+#todoList:empty::before { content: "Nothing to do yet."; color: var(--muted); font-size: 13px; }
+#todoList li { display: flex; align-items: center; gap: 9px; padding: 5px 2px; font-size: 14px; }
+#todoList li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+#todoList li.done span { color: var(--muted); text-decoration: line-through; }
+#todoList input { flex: none; width: 16px; height: 16px; margin: 0; accent-color: var(--event); }
+#todoList button { width: 22px; height: 22px; padding: 0; background: none; border: 0; border-radius: 6px; color: var(--muted); font-size: 16px; line-height: 1; visibility: hidden; }
+#todoList li:hover button, #todoList button:focus-visible { visibility: visible; }
+#todoList button:hover { background: var(--line); color: var(--text); }
+
+/* quote of the day */
+.quote { flex: none; }
+.quote-label { margin-bottom: 8px; font-size: 12px; font-weight: 500; color: var(--muted); }
+.quote blockquote { margin: 0; font-size: 15px; line-height: 1.45; font-style: italic; }
+.quote blockquote::before { content: "\201C"; }
+.quote blockquote::after { content: "\201D"; }
+.quote cite { display: block; margin-top: 8px; font-size: 12px; font-style: normal; color: var(--muted); }
+.quote cite::before { content: "\2014  "; }
+
+/* small divider inside the search bar */
+.sep { flex: none; align-self: center; width: 1px; height: 22px; margin: 0 5px; background: var(--line); }
+
+/* focus mode: hide everything, lighten the wallpaper, search bar slides to the middle */
+#scrim { transition: opacity .5s ease; }
+.stage, .meta { transition: opacity .4s ease, visibility 0s; }
+.side .card { transition: transform .5s ease; }
+html.focus #scrim { opacity: .15; }
+html.focus .top { transform: translateY(calc(50vh - 27px - var(--pad))); }
+html.focus .stage, html.focus .meta { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .4s ease, visibility 0s linear .4s; }
+html.focus .side .card { transform: translateX(-110%); }
+
+/* ---------- settings ---------- */
+dialog {
+  width: min(460px, calc(100vw - 32px));
+  padding: 22px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  backdrop-filter: blur(22px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+dialog::backdrop { background: rgba(0, 0, 0, .45); }
+dialog h2 { margin: 0 0 14px; font-size: 18px; }
+dialog label { display: block; margin-bottom: 14px; font-size: 13px; color: var(--muted); }
+dialog input, dialog select, dialog textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 10px;
+  font: inherit;
+  color: var(--text);
+  background: var(--line);
+  border: 1px solid transparent;
+  border-radius: 10px;
+  outline: 0;
+}
+dialog input:focus, dialog select:focus, dialog textarea:focus { border-color: var(--event); }
+dialog textarea { resize: vertical; }
+dialog input:disabled { opacity: .45; }
+dialog input[type="range"] { padding: 0; background: none; }
+dialog output { color: var(--text); font-variant-numeric: tabular-nums; }
+dialog .check { display: flex; align-items: center; gap: 8px; }
+dialog .check input { display: inline-block; width: auto; margin: 0; }
+#sClose, #dayClose { padding: 9px 18px; background: var(--text); color: var(--panel); border: 0; border-radius: 10px; font-weight: 600; }
+
+#sentinel { height: 1px; }
+
+/* mic while recording */
+#voice.rec { color: var(--gcal); animation: pulse 1s ease-in-out infinite; }
+
+/* day dialog */
+#dayList { list-style: none; margin: 0 0 14px; padding: 0; }
+#dayList:empty::before { content: "No events yet."; color: var(--muted); }
+#dayList li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+#dayList li span:nth-child(2) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+#dayList button { width: 26px; height: 26px; padding: 0; background: none; border: 0; border-radius: 6px; color: var(--muted); font-size: 18px; line-height: 1; }
+#dayList button:hover { background: var(--line); color: var(--text); }
+#dayForm { display: flex; gap: 8px; margin-bottom: 14px; }
+#dayForm input { flex: 1; width: auto; margin: 0; }
+#dayForm button { padding: 0 14px; border: 0; border-radius: 10px; background: var(--text); color: var(--panel-solid); font-weight: 600; }
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+#toast.show { opacity: 1; }
+
+@media (max-width: 760px) { .side { display: none; } }
+@media (max-height: 720px) {
+  .cal-legend { display: none; }
+  .quote blockquote { font-size: 14px; }
+  .side .card { padding-top: 12px; padding-bottom: 12px; }
+}
+@media (max-width: 560px) {
+  .tools { display: none; }
+  #sugg { grid-template-columns: 1fr; }
+  #sugg .col + .col { padding-left: 0; border-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

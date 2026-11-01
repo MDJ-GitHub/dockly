@@ -1,0 +1,21 @@
+# Copyright 2026 The Dockium Authors.
+# chrome/browser/ui/webui/dockium_welcome/BUILD.gn
+
+source_set("dockium_welcome") {
+  sources = [
+    "dockium_welcome_launch.cc",
+    "dockium_welcome_launch.h",
+    "dockium_welcome_ui.cc",
+    "dockium_welcome_ui.h",
+  ]
+  deps = [
+    "//base",
+    "//chrome/browser/profiles:profile",
+    "//chrome/browser/resources/dockium_welcome:resources_grit",
+    "//chrome/common",
+    "//components/prefs",
+    "//content/public/browser",
+    "//services/network/public/mojom",
+    "//ui/webui",
+  ]
+}
