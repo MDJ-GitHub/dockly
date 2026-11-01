@@ -14,8 +14,8 @@
 <td align="left" width="60%">
 
 <p align="center">
-<h1> ⚓ Dockium ⚓ </h1>
-🌐 <b>Dock Everything. Connect Endlessly.</b>
+<h1> 🌐 Dockium 🌐 </h1>
+<b>Dock Everything. Connect Endlessly.</b>
 </p>
 
 ## ✨ Overview
@@ -56,15 +56,10 @@ Close the browser and stay distraction-free. Dockium keeps running in your syste
 A custom, aggressive discard engine freezes inactive tabs, reducing RAM and CPU usage to virtually zero. Tabs stay in your bar as lightweight shells with their full history and reload instantly when you return.
 
 🛡️ **Rust-Powered Adblocker**
-- Distraction-free web apps at high speed
-- Works in normal browsing *and* inside docked sidebar sessions
-- Customizable domain-level controls
+Enjoy distraction-free web apps with an adblocker powered by high-speed Rust performance. Whether you are browsing normally or working inside docked sidebar sessions, keep every page clean and fast with customizable domain-level controls.
 
 🧅 **Anonymous Browsing on Your Terms**
-- Integrated Tor routing for your entire connection
-- Per-site and per-docked-app proxy rules
-- Choose your exit country, or auto-route for optimal speed
-- Plug in your own custom VPN/proxy server
+Take complete control of your online presence with integrated Tor routing. Route your entire connection or assign specific proxy rules per site and docked app. Choose your preferred exit country, auto-route for optimal speed, or plug in your own custom VPN/proxy server—giving you elite-level privacy with zero extra cost.
 
 🎛️ **Your Dock, Your Way**  
 Move the dock anywhere you like, then fine-tune its width and icon size until it feels exactly right.
@@ -73,84 +68,118 @@ Move the dock anywhere you like, then fine-tune its width and icon size until it
 
 ## ⚙️ How It Works
 
-- 🧩 **Chromium** provides the engine and web compatibility  
-- ⚓ **Session-isolated dock apps** keep every account separate  
-- 🔔 **System tray service** keeps docked apps alive and counts unread alerts  
-- 🦀 **Rust** powers the high-speed adblock engine  
-- 🧅 **Tor / proxy routing** handles per-site and global privacy  
+- 🧩 **Chromium** > The most popular browser base. With exception of Google API stuff, fully compatible with all standard Chrome features.
+- ⚓ **Session-isolated dock apps** > Each dock app have it's own session, Allow multiple same active website each with its own account.
+- 🔔 **System tray service** > Closing the browser will simply dock it into the tray in form of counter counting total unread notifications.
+- 🦀 **Rust Adblocker** > Powers the high-speed adblock engine easily customizable to use for all or specific websites.  
+- 🧅 **Tor / proxy VPN routing** > Handles per-site and global privacy customizable to use for all or specific websites.
 
 ---
 
 ## 🖼️ Screenshots & Guide
 
+<p align="center">
+  <img src="images/slide1.png" alt="Welcome to Dockium" width="80%" />
+</p>
+
 <table align="center">
 <tr>
-<td align="center" width="50%">
+<td align="center" width="50%" valign="top">
 
-### ⚓ Dock Everything  
-<img src="images/slide2.png" alt="Dock Everything" />
+<h3>⚓ Dock Everything</h3>
+<img src="images/slide2.png" alt="Dock Everything" width="100%" />
 
-<br>
-
-### 💡 Usage Tips
-
-<div align="left">
-
-- ➕ **Add Button (+)**  
-  Docks the current site as its own session-isolated app  
-
-- 🔔 **System Tray**  
-  Keep Dockium running in the tray to receive alerts and see your unread count  
-
-- 😴 **Power Sleep**  
-  Inactive tabs are frozen automatically and reload instantly when you return  
-
-- 🛡️ **Adblocker**  
-  Manage blocking per domain, in both normal tabs and docked sessions  
-
-</div>
+<p align="left">
+Dock any website as its own app with a <b>fully isolated session</b>. Docked apps stay <b>always alive</b> in the background and show a <b>red badge</b> with the total number of notifications.
+</p>
+<ul align="left">
+  <li>➕ <b>Add Button (+)</b>: docks the current site as its own app</li>
+  <li>🔴 <b>Red Badge</b>: live count of all unread notifications</li>
+  <li>🔐 <b>Separate Sessions</b>: cookies and logins never mix between apps</li>
+</ul>
 
 </td>
-<td align="center" width="50%">
+<td align="center" width="50%" valign="top">
 
-### 🎛️ Your Dock, Your Way  
-<img src="images/slide7.png" alt="Dock Customization" />
+<h3>🔔 System Tray</h3>
+<img src="images/slide3.png" alt="System Tray" width="100%" />
 
-<br>
+<p align="left">
+Closing the browser window docks Dockium into the tray instead of quitting. It stays alive and shows a <b>counter of all unread items across your docked apps</b>.
+</p>
+<ul align="left">
+  <li>📥 <b>Close to Tray</b>: the browser keeps running in the background</li>
+  <li>🔢 <b>Unified Counter</b>: one tray badge for every dock app</li>
+  <li>⚡ <b>Instant Restore</b>: click the tray icon to bring everything back</li>
+</ul>
 
-### 💡 Privacy Tips
+</td>
+</tr>
+<tr>
+<td align="center" width="50%" valign="top">
 
-<div align="left">
+<h3>🛡️ Adblocker</h3>
+<img src="images/slide5.png" alt="Adblocker" width="100%" />
 
-- 🧅 **Tor Routing**  
-  Route your whole connection or assign rules per site and docked app  
+<p align="left">
+A built-in adblocker that works in both normal tabs and docked sessions.
+</p>
+<ul align="left">
+  <li>🌐 <b>Per-Domain Control</b>: enable or disable blocking for each site</li>
+  <li>⚓ <b>Works in Docks</b>: docked apps can have their own rules</li>
+  <li>🚀 <b>Faster Pages</b>: less clutter and fewer trackers</li>
+</ul>
 
-- 🌍 **Exit Country**  
-  Pick a specific country, or let Dockium auto-route for the best speed  
+</td>
+<td align="center" width="50%" valign="top">
 
-- 🔌 **Custom Proxy / VPN**  
-  Add your own server for full control  
+<h3>😴 Power Sleep</h3>
+<img src="images/slide4.png" alt="Power Sleep" width="100%" />
 
-- 📐 **Dock Layout**  
-  Move the dock anywhere and adjust its width and icon size  
+<p align="left">
+Save RAM and battery without losing your place.
+</p>
+<ul align="left">
+  <li>🧊 <b>Auto Freeze</b>: inactive tabs are put to sleep automatically</li>
+  <li>⚡ <b>Instant Reload</b>: tabs wake up the moment you return</li>
+  <li>🔋 <b>Lower Usage</b>: noticeably less CPU and memory</li>
+</ul>
 
-</div>
+</td>
+</tr>
+<tr>
+<td align="center" width="50%" valign="top">
+
+<h3>🧅 Anonymous Browsing</h3>
+<img src="images/slide6.png" alt="Anonymous Browsing" width="100%" />
+
+<p align="left">
+Built-in privacy routing, no extensions needed.
+</p>
+<ul align="left">
+  <li>🧅 <b>Tor Routing</b>: route everything, or set rules per site and docked app</li>
+  <li>🌍 <b>Exit Country</b>: pick a country or let Dockium auto-route for speed</li>
+  <li>🔌 <b>Custom Proxy / VPN</b>: add your own server for full control</li>
+</ul>
+
+</td>
+<td align="center" width="50%" valign="top">
+
+<h3>🎛️ Your Dock, Your Way</h3>
+<img src="images/slide7.png" alt="Dock Customization" width="100%" />
+
+<p align="left">
+Make the dock fit your workflow.
+</p>
+<ul align="left">
+  <li>📐 <b>Flexible Position</b>: move the dock to any side of the window</li>
+  <li>↔️ <b>Adjustable Width</b>: slim or wide, your choice</li>
+  <li>🖼️ <b>Icon Size</b>: scale icons to match your screen</li>
+</ul>
 
 </td>
 </tr>
 </table>
-
-<p align="center">
-  <img src="images/slide1.png" alt="Welcome to Dockium" width="45%" />
-  <img src="images/slide3.png" alt="Out of Sight, Never Out of Touch" width="45%" />
-</p>
-<p align="center">
-  <img src="images/slide4.png" alt="Power Sleep" width="45%" />
-  <img src="images/slide5.png" alt="Adblocker" width="45%" />
-</p>
-<p align="center">
-  <img src="images/slide6.png" alt="Anonymous Browsing" width="45%" />
-</p>
 
 ---
 
